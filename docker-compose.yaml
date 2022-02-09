@@ -1,0 +1,59 @@
+version: "2.4"
+
+services:
+  spark:
+    image: docker.io/bitnami/spark:3.2.1
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - "38080:8080"
+    networks:
+      mynet:
+        ipv4_address: 10.84.0.1
+    
+      
+  spark-worker:
+    image: docker.io/bitnami/spark:3.2.1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://10.84.0.1:7077
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    networks:
+      mynet:
+        ipv4_address: 10.84.0.2
+    
+  s3:
+    image: bitnami/minio:2022.2.7
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - 'minio_data:/data'
+    environment:
+      MINIO_ACCESS_KEY: minio_access_key
+      MINIO_SECRET_KEY: minio_secret_key
+      MINIO_DEFAULT_BUCKETS: testbucket
+    networks:
+      mynet:
+        ipv4_address: 10.84.0.3
+      
+volumes:
+  minio_data:
+    driver: local
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.84.0.0/16
+         gateway: 10.84.0.254
