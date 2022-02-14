@@ -4,14 +4,15 @@ from datetime import datetime
 spark_args = {
     "master": "spark://10.84.0.1:7077",
     "name": "my_spark_job_client",
-    "files": "./data.csv",
-    "spark_home": "./env/lib/python3.10/site-packages/pyspark"
+    "spark_home": "./env/lib/python3.10/site-packages/pyspark",
+    "conf": ["spark.executor.extraClassPath='/opt/bitnami/spark/jars/*'"]
 }
 
 app = SparkJob("./spark_job.py", **spark_args)
 try:
     app.submit()
-except:
+except Exception as e:
+    print(e)
     print(f"{datetime.now()} --- Error in Spark job, state is {app.get_state()}, {app.get_code()}")
 print(f"{datetime.now()} --- Submitted Spark job, state is {app.get_state()}")
 

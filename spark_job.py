@@ -24,7 +24,7 @@ if __name__ == "__main__":
           .option("sep", ";")
           .option("header", "false")
           .schema(userSchema)
-          .csv("s3a://testbucket/data.csv"))
+          .csv("s3a://testbucket/*.csv"))
 
     df.createOrReplaceTempView("my_data")
 
